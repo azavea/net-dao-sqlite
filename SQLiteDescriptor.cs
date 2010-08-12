@@ -119,6 +119,12 @@ namespace Azavea.Open.DAO.SQLite
         /// <exclude/>
         public override void SetParametersOnCommand(IDbCommand cmd, IEnumerable parameters)
         {
+            // TODO TODO TODO TODO
+            // This is almost a complete cut-n-paste from the SQLServerDescriptor.SetParametersOnCommand.
+            // The only difference is the class of the IDbParameter object instantiated.
+            // We need to refactor this into some sort of helper method, or even better,
+            // make it so we can construct the SQL with @params in the first place rather
+            // than always using ?'s even if the DB does not understand them.
             IEnumerator enumer = parameters.GetEnumerator();
 
             if (enumer.MoveNext())
