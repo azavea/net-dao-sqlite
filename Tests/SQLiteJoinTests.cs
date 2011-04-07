@@ -37,7 +37,7 @@ namespace Azavea.Open.DAO.SQLite.Tests
             : base(
                 new FastDAO<JoinClass1>(new Config("..\\..\\Tests\\SQLiteDao.config", "SQLiteDaoConfig"), "DAO"),
                 new FastDAO<JoinClass2>(new Config("..\\..\\Tests\\SQLiteDao.config", "SQLiteDaoConfig"), "DAO"),
-                true, true, false, false) { }
+                true, true, false, false, true) { }
 
         /// <exclude/>
         [TestFixtureSetUp]
@@ -46,6 +46,7 @@ namespace Azavea.Open.DAO.SQLite.Tests
             // Reset the unit test database by copying the template, since we don't know what any
             // other unit tests (or a previous run of this test) has done to the state of the db.
             File.Copy("..\\..\\Tests\\Template\\UnitTest.db", "..\\..\\Tests\\UnitTest.db", true);
+            ResetAllTables();
         }
     }
 }

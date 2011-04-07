@@ -91,6 +91,16 @@ namespace Azavea.Open.DAO.SQLite
         }
 
         /// <summary>
+        /// Returns the appropriate data access layer for this connection.  The default
+        /// implementation returns a normal SQL data access layer, but this may be
+        /// overridden in particular DB connection descriptors.
+        /// </summary>
+        public override IDaLayer CreateDataAccessLayer()
+        {
+            return new SQLiteDaLayer(this);
+        }
+
+        /// <summary>
         /// The fully qualified path to the database file.
         /// </summary>
         public string DatabasePath
