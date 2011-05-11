@@ -36,16 +36,6 @@ namespace Azavea.Open.DAO.SQLite.Tests
         /// <exclude/>
         public SQLiteDaoTests()
             : base(new Config("..\\..\\Tests\\SQLiteDao.config", "SQLiteDaoConfig"), "DAO", true) { }
-
-        /// <exclude/>
-        [TestFixtureSetUp]
-        public virtual void Init()
-        {
-            // Reset the unit test database by copying the template, since we don't know what any
-            // other unit tests (or a previous run of this test) has done to the state of the db.
-            File.Copy("..\\..\\Tests\\Template\\UnitTest.db", "..\\..\\Tests\\UnitTest.db", true);
-            ResetAllTables();
-        }
         /// <exclude/>
         [Test]
         public void TestGetMappingFromSchema()

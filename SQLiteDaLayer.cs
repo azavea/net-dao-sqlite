@@ -22,6 +22,8 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 using System;
+using System.Data.SQLite;
+using System.IO;
 using Azavea.Open.DAO.SQL;
 
 namespace Azavea.Open.DAO.SQLite
@@ -98,6 +100,60 @@ namespace Azavea.Open.DAO.SQLite
                 "SELECT COUNT(*) FROM sqlite_master where type = 'sequence' and name = '" +
                 name + "'", null);
             return count == 0;
+        }
+
+        /// <summary>
+        /// Returns true if you need to call "CreateStoreHouse" before storing any
+        /// data.  This method is "Missing" not "Exists" because implementations that
+        /// do not use a store house (I.E. single-file-based data access layers) can
+        /// return "false" from this method without breaking either a user's app or the
+        /// spirit of the method.
+        /// 
+        /// Store house typically corresponds to "database".
+        /// 
+        /// For SQLite, this merely verifies the file exists, not that you have
+        /// any particular security permissions or even that it is a valid SQLite
+        /// database.
+        /// </summary>
+        /// <returns>Returns true if you need to call "CreateStoreHouse"
+        ///          before storing any data.</returns>
+        public override bool StoreHouseMissing()
+        {
+            return !(File.Exists(((SQLiteDescriptor)_connDesc).DatabasePath));
+        }
+
+        /// <summary>
+        /// Creates the store house specified in the connection descriptor.  If this
+        /// data source doesn't use a store house, this method should be a no-op.
+        /// 
+        /// If this data source DOES use store houses, but support for adding
+        /// them is not implemented yet, this should throw a NotImplementedException.
+        /// 
+        /// Store house typically corresponds to "database".
+        /// 
+        /// For SQLite this creates a blank database file (no tables).
+        /// </summary>
+        public override void CreateStoreHouse()
+        {
+            SQLiteConnection.CreateFile(((SQLiteDescriptor)_connDesc).DatabasePath);
+        }
+
+        /// <summary>
+        /// Deletes the store house specified in the connection descriptor.  If this
+        /// data source doesn't use a store house, this method should be a no-op.
+        /// 
+        /// If this data source DOES use store houses, but support for dropping
+        /// them is not implemented yet, this should throw a NotImplementedException.
+        /// 
+        /// Store house typically corresponds to "database".
+        /// 
+        /// If there is no store house with the given name, this should be a no-op.
+        /// 
+        /// For SQLite, this just deletes the database file.
+        /// </summary>
+        public override void DeleteStoreHouse()
+        {
+            File.Delete(((SQLiteDescriptor)_connDesc).DatabasePath);
         }
 
         #endregion
