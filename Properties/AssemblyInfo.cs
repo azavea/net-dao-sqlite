@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
@@ -8,11 +7,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Azavea.Open.DAO.SQLite")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Azavea")]
 [assembly: AssemblyProduct("Azavea.Open.DAO.SQLite")]
-[assembly: AssemblyCopyright("Copyright © Azavea 2010")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
 // Configure log4net using the .config file
 [assembly: log4net.Config.XmlConfigurator(Watch = true)]
 
@@ -23,16 +18,3 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("b7f5a41f-054f-4a64-80f6-5098e01e50c0")]
-
-// Version information for an assembly consists of the following four values:
-//
-//      Major Version
-//      Minor Version 
-//      Build Number
-//      Revision
-//
-// You can specify all the values or you can default the Build and Revision Numbers 
-// by using the '*' as shown below:
-// [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
