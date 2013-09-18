@@ -77,6 +77,7 @@
     <Compile Include="Tests\SQLiteJoinTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Azavea.Open.DAO.SQLite.nuspec" />
     <None Include="packages.config" />
     <None Include="Tests\BasicTest.config" />
     <None Include="Tests\SQLiteDao.config" />
@@ -86,9 +87,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Azavea.Open.DAO.SQLite.NamespaceDocs.xml">
-    </Content>
-    <Content Include="lib\System.Data.SQLite_LICENSE.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Tests\Mapping.xml" />
   </ItemGroup>
