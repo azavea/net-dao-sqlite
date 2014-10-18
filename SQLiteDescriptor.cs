@@ -38,11 +38,13 @@ namespace Azavea.Open.DAO.SQLite
     /// to communicate with a SQLite database.
     /// </summary>
     public class SQLiteDescriptor : AbstractSqlConnectionDescriptor, ITransactionalConnectionDescriptor
-	{
+    {
         private readonly string _databasePath;
         private readonly string _connectionStr;
         private readonly string _cleanConnStr;
-        private readonly bool _usePooling = true;
+        // we want to disable pooling so we don't wind up locking
+        // the file indefinitely.
+        private readonly bool _usePooling = false;
 
         /// <summary>
         /// Constructor for talking to a SQLite database.
@@ -50,22 +52,19 @@ namespace Azavea.Open.DAO.SQLite
         /// <param name="databasePath">Path to the db file.</param>
         public SQLiteDescriptor(string databasePath)
         {
-            if (!StringHelper.IsNonBlank(databasePath))
-            {
-                throw new ArgumentNullException("databasePath", "Database file path cannot be null/blank.");
-            }
             SQLiteConnectionStringBuilder builder = new SQLiteConnectionStringBuilder();
-            builder.DataSource = _databasePath = databasePath;
-            
-            // we want to disable pooling so we don't wind up locking
-            // the file indefinitely.
-            builder.Pooling = false;
-            _usePooling = false;
+            builder.Pooling = _usePooling;
+
+            if (StringHelper.IsNonBlank(databasePath))
+            {
+                builder.DataSource = _databasePath = databasePath;
+            }
+
             // There is no password, so the strings are the same.
             _cleanConnStr = builder.ToString();
             _connectionStr = builder.ToString();
         }
-       
+
         /// <summary>
         /// This constructor reads all the appropriate values from our standard config file
         /// in the normal format.
@@ -76,19 +75,7 @@ namespace Azavea.Open.DAO.SQLite
         ///                                  May be null if passwords are in plain text.</param>
         public SQLiteDescriptor(Config config, string component,
             ConnectionInfoDecryptionDelegate decryptionDelegate)
-        {
-            SQLiteConnectionStringBuilder builder = new SQLiteConnectionStringBuilder();
-            
-            builder.Pooling = false;
-            _usePooling = false;
-            
-            builder.DataSource = _databasePath = config.GetParameterWithSubstitution(component, "Database", true);
-
-            // We don't currently support passwords, so the clean conn str is the same
-            // as the real one.
-            _cleanConnStr = builder.ToString();
-            _connectionStr = builder.ToString();
-        }
+            : this(config.GetParameterWithSubstitution(component, "Database", true)) { }
 
         /// <summary>
         /// Returns the appropriate data access layer for this connection.  The default
@@ -104,9 +91,9 @@ namespace Azavea.Open.DAO.SQLite
         /// The fully qualified path to the database file.
         /// </summary>
         public string DatabasePath
-		{
-			get{return _databasePath;}
-		}
+        {
+            get { return _databasePath; }
+        }
 
         /// <exclude/>
         public override string ToCleanString()
@@ -124,6 +111,10 @@ namespace Azavea.Open.DAO.SQLite
         public override DbConnection CreateNewConnection()
         {
             return new SQLiteConnection(_connectionStr);
+        }
+
+        public bool InMemoryOnly()
+        {
         }
 
         /// <exclude/>
@@ -204,8 +195,9 @@ namespace Azavea.Open.DAO.SQLite
         /// <exclude/>
         public override DbDataAdapter CreateNewAdapter(IDbCommand cmd)
         {
-            return new SQLiteDataAdapter((SQLiteCommand) cmd);
+            return new SQLiteDataAdapter((SQLiteCommand)cmd);
         }
+
         /// <exclude/>
         public override bool UsePooling()
         {
