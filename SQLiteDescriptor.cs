@@ -40,6 +40,7 @@ namespace Azavea.Open.DAO.SQLite
     public class SQLiteDescriptor : AbstractSqlConnectionDescriptor, ITransactionalConnectionDescriptor
     {
         private readonly string _databasePath;
+        private readonly string _fullUri;
         private readonly string _connectionStr;
         private readonly string _cleanConnStr;
         // we want to disable pooling so we don't wind up locking
@@ -50,7 +51,7 @@ namespace Azavea.Open.DAO.SQLite
         /// Constructor for talking to a SQLite database.
         /// </summary>
         /// <param name="databasePath">Path to the db file.</param>
-        public SQLiteDescriptor(string databasePath)
+        public SQLiteDescriptor(string databasePath, string fullUri)
         {
             SQLiteConnectionStringBuilder builder = new SQLiteConnectionStringBuilder();
             builder.Pooling = _usePooling;
@@ -58,6 +59,10 @@ namespace Azavea.Open.DAO.SQLite
             if (StringHelper.IsNonBlank(databasePath))
             {
                 builder.DataSource = _databasePath = databasePath;
+            }
+            else if (StringHelper.IsNonBlank(fullUri))
+            {
+                builder.FullUri = _fullUri = fullUri;
             }
 
             // There is no password, so the strings are the same.
@@ -74,8 +79,25 @@ namespace Azavea.Open.DAO.SQLite
         /// <param name="decryptionDelegate">Delegate to call to decrypt password fields.
         ///                                  May be null if passwords are in plain text.</param>
         public SQLiteDescriptor(Config config, string component,
-            ConnectionInfoDecryptionDelegate decryptionDelegate)
-            : this(config.GetParameterWithSubstitution(component, "Database", true)) { }
+            ConnectionInfoDecryptionDelegate decryptionDelegate) :
+            this(GetParameterOrDefault(config, component, "Database"),
+                 GetParameterOrDefault(config, component, "FullUri")
+            ) { }
+
+        /// <summary>
+        /// Return parameter value in config section or empty string if not found.
+        /// </summary>
+        protected static string GetParameterOrDefault(Config config, string component, string parameter)
+        {
+            try
+            {
+                return config.GetParameterWithSubstitution(component, parameter, true);
+            }
+            catch (LoggingException)
+            {
+            }
+            return "";
+        }
 
         /// <summary>
         /// Returns the appropriate data access layer for this connection.  The default
@@ -115,6 +137,18 @@ namespace Azavea.Open.DAO.SQLite
 
         public bool InMemoryOnly()
         {
+            string fileOrUri = StringHelper.IsNonBlank(_fullUri) ? _fullUri : _databasePath;
+            return fileOrUri.ToUpper().IndexOf(":MEMORY:") != -1
+                || fileOrUri.ToUpper().IndexOf("MODE=MEMORY") != -1;
+        }
+
+        public bool UsingSharedCache()
+        {
+            if (StringHelper.IsNonBlank(_fullUri))
+            {
+                return _fullUri.ToUpper().IndexOf("CACHE=SHARED") != -1;
+            }
+            return false;
         }
 
         /// <exclude/>

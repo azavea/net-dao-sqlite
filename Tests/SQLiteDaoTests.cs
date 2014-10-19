@@ -36,6 +36,13 @@ namespace Azavea.Open.DAO.SQLite.Tests
         /// <exclude/>
         public SQLiteDaoTests()
             : base(new Config("..\\..\\Tests\\SQLiteDao.config", "SQLiteDaoConfig"), "DAO", true) { }
+
+        protected override bool TransactionsLockData(IConnectionDescriptor connDesc)
+        {
+            SQLiteDescriptor conn = (SQLiteDescriptor)connDesc;
+            return conn.InMemoryOnly() && conn.UsingSharedCache();
+        }
+
         /// <exclude/>
         [Test]
         public void TestGetMappingFromSchema()
