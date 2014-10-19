@@ -119,7 +119,15 @@ namespace Azavea.Open.DAO.SQLite
         ///          before storing any data.</returns>
         public override bool StoreHouseMissing()
         {
-            return !(File.Exists(((SQLiteDescriptor)_connDesc).DatabasePath));
+            SQLiteDescriptor conn = (SQLiteDescriptor)_connDesc;
+            if (conn.InMemoryOnly())
+            {
+                return true;
+            }
+            else
+            {
+                return !(File.Exists(conn.DatabasePath));
+            }
         }
 
         /// <summary>
@@ -135,7 +143,11 @@ namespace Azavea.Open.DAO.SQLite
         /// </summary>
         public override void CreateStoreHouse()
         {
-            SQLiteConnection.CreateFile(((SQLiteDescriptor)_connDesc).DatabasePath);
+            SQLiteDescriptor conn = (SQLiteDescriptor)_connDesc;
+            if (!conn.InMemoryOnly())
+            {
+                SQLiteConnection.CreateFile(conn.DatabasePath);
+            }
         }
 
         /// <summary>
@@ -153,7 +165,11 @@ namespace Azavea.Open.DAO.SQLite
         /// </summary>
         public override void DeleteStoreHouse()
         {
-            File.Delete(((SQLiteDescriptor)_connDesc).DatabasePath);
+            SQLiteDescriptor conn = (SQLiteDescriptor)_connDesc;
+            if (!conn.InMemoryOnly())
+            {
+                File.Delete(conn.DatabasePath);
+            }
         }
 
         #endregion
